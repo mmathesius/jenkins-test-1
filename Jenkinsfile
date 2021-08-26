@@ -16,5 +16,10 @@ pipeline {
                 sh 'printenv'
             }
         }
+        stage('Report Results') {
+            steps {
+                echo "Results"
+            }
+        }
     }
 }
