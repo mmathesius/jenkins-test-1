@@ -19,6 +19,7 @@ pipeline {
         stage('Report Results') {
             steps {
                 echo "Results"
+                extmail subject: "test subject", body: "test body", to: "mmathesi@redhat.com"
             }
         }
     }
