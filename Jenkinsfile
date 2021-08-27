@@ -19,7 +19,7 @@ pipeline {
         stage('Report Results') {
             steps {
                 echo "Results"
-                emailext to: "mmathesi@redhat.com", subject: "test subject", body: "test body"
+                emailext to: "mmathesi@redhat.com", from: "merlinm-jenkins-test@redhat.com", subject: "test subject", body: "test body"
             }
         }
     }
