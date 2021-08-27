@@ -19,7 +19,9 @@ pipeline {
         stage('Report Results') {
             steps {
 		echo "Results"
-		sh 'pwd ; ls -la'
+		sh 'pwd'
+                sh 'ls -la'
+                sh 'cat README.md'
                 script {
 		    def Message = "test message"
 		    emailext to: "mmathesi@redhat.com",
