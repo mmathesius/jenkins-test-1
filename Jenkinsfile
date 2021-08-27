@@ -18,14 +18,15 @@ pipeline {
         }
         stage('Report Results') {
             steps {
-              script {
-                def Message = "test message"
-                echo "Results"
-                emailext to: "mmathesi@redhat.com",
-                    from: "merlinm-jenkins-test@redhat.com",
-                    subject: "test subject",
-                    body: "test body"
-              }
+		echo "Results"
+		sh 'pwd ; ls -la'
+                script {
+		    def Message = "test message"
+		    emailext to: "mmathesi@redhat.com",
+			from: "merlinm-jenkins-test@redhat.com",
+			subject: "test subject",
+			body: "test body"
+                }
             }
         }
     }
