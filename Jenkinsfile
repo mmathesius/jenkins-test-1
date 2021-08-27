@@ -18,6 +18,7 @@ pipeline {
         }
         stage('Report Results') {
             steps {
+                def Message = "test message"
                 echo "Results"
                 emailext to: "mmathesi@redhat.com",
                     from: "merlinm-jenkins-test@redhat.com",
