@@ -16,20 +16,29 @@ pipeline {
                 sh 'printenv'
             }
         }
-        stage('Report Results') {
+
+        stage('Report Compose result') {
             steps {
-		echo "Results"
-		sh 'pwd'
-                sh 'ls -la'
-                sh 'cat README.md'
                 script {
-		    def Message = "test message"
-		    emailext to: "mmathesi@redhat.com",
-			from: "merlinm-jenkins-test@redhat.com",
-			subject: "test subject",
-			body: "test body"
+                    def composeattrs = readJSON file: 'response.json'
+                    def buildname = composeattrs['pungi_compose_id']
+                    def buildstatus = (composeattrs['state'] == 4) ? 'FAIL' : 'SUCCESS'
+                    currentBuild.displayName = "$buildname"
+
+		    echo "Jenkins build $buildname status = $buildstatus"
+
+                    if (buildstatus == 'FAILED') {
+		        def Message = "test message body"
+		        emailext to: "mmathesi@redhat.com",
+			    from: "merlinm-jenkins-test@redhat.com",
+			    subject: "Jenkins build $buildname FAILED!,
+			    body: Message
+
+                        error 'Compose Failed'
+                    }
                 }
             }
         }
+
     }
 }
