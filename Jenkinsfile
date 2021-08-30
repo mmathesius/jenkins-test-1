@@ -1,4 +1,5 @@
-def g = "global var"
+def failure_email_sender = "merlinm-jenkins-test@redhat.com"
+def failure_email_recipient = "mmathesi@redhat.com"
 
 pipeline {
     agent {
@@ -28,14 +29,18 @@ pipeline {
                     currentBuild.displayName = "$buildname"
 
 		    echo "Jenkins build $buildname status = $buildstatus"
-		    echo "G = $g"
 
                     if (buildstatus == 'FAIL') {
-		        def Message = "test message body"
-		        emailext to: "mmathesi@redhat.com",
-			    from: "merlinm-jenkins-test@redhat.com",
-			    subject: "Jenkins build $buildname FAILED!",
-			    body: Message
+		        def failure_subject = "Production compose $buildname has FAILED!"
+		        def failure_message = """Greetings.
+
+Jenkins production compose build $buildname has failed.
+
+Job URL: ${BUILD_URL}"""
+		        emailext to: failure_email_recipient,
+			    from: failure_email_sender,
+			    subject: failure_subject,
+			    body: failure_message
 
                         error 'Compose Failed'
                     }
