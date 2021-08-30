@@ -33,10 +33,12 @@ pipeline {
 
                     if (buildstatus == 'FAIL') {
                         // track down details for last successful compose
-                        url = composeattrs['toplevel_url'] + "/../" + composeattrs['compose_type']
-                        url += "/latest-CentOS-Stream/compose/metadata/composeinfo.json"
+                        def toplevel_url = composeattrs['toplevel_url']
+                        def compose_type = composeattrs['compose_type']
 
-                        echo "URL with compose details for last successful build of type $composeattrs['compose_type']: $url"
+                        url = "$toplevel_url/../$compose_type/latest-CentOS-Stream/compose/metadata/composeinfo.json"
+
+                        echo "URL with compose details for last successful build of type $compose_type: $url"
 
                         failed_days = 0
 
