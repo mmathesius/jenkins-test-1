@@ -1,3 +1,5 @@
+def g = "global var"
+
 pipeline {
     agent {
         label '!windows'
@@ -26,6 +28,7 @@ pipeline {
                     currentBuild.displayName = "$buildname"
 
 		    echo "Jenkins build $buildname status = $buildstatus"
+		    echo "G = $g"
 
                     if (buildstatus == 'FAIL') {
 		        def Message = "test message body"
