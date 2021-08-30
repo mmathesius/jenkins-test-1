@@ -31,7 +31,7 @@ pipeline {
 		        def Message = "test message body"
 		        emailext to: "mmathesi@redhat.com",
 			    from: "merlinm-jenkins-test@redhat.com",
-			    subject: "Jenkins build $buildname FAILED!,
+			    subject: "Jenkins build $buildname FAILED!",
 			    body: Message
 
                         error 'Compose Failed'
