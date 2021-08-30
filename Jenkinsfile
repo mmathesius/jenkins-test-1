@@ -32,13 +32,14 @@ pipeline {
                     echo "Build $buildname status: $buildstatus"
 
                     if (buildstatus == 'FAIL') {
-                        failed_days = 0
-                        # track down details for last successful compose
+                        // track down details for last successful compose
                         url = "$composeattrs['toplevel_url']"
                         url += "/../$composeattrs['compose_type']"
                         url += "/latest-CentOS-Stream/compose/metadata/composeinfo.json"
 
                         echo "URL with compose details for last successful build of type $composeattrs['compose_type']: $url"
+
+                        failed_days = 0
 
                         if (failed_days >= failure_days_to_notify) {
                             def failure_subject = "Development compose $buildname pipeline has been failing for $failed_days days"
