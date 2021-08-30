@@ -1,3 +1,4 @@
+def failure_days_to_notify = 2
 def failure_email_sender = "merlinm-jenkins-test@redhat.com"
 def failure_email_recipient = "mmathesi@redhat.com"
 
@@ -28,25 +29,33 @@ pipeline {
                     def buildstatus = (composeattrs['state'] == 4) ? 'FAIL' : 'SUCCESS'
                     currentBuild.displayName = "$buildname"
 
-		    echo "Jenkins build $buildname status = $buildstatus"
+                    echo "Build $buildname status: $buildstatus"
 
                     if (buildstatus == 'FAIL') {
-		        def failure_subject = "Production compose $buildname has FAILED!"
-		        def failure_message = """Greetings.
+                        failed_days = 0
+                        # track down details for last successful compose
+                        url = "$composeattrs['toplevel_url']"
+                        url += "/../$composeattrs['compose_type']"
+                        url += "/latest-CentOS-Stream/compose/metadata/composeinfo.json"
 
-Jenkins production compose build $buildname has failed.
+                        echo "URL with compose details for last successful build of type $composeattrs['compose_type']: $url"
+
+                        if (failed_days >= failure_days_to_notify) {
+                            def failure_subject = "Development compose $buildname pipeline has been failing for $failed_days days"
+                            def failure_message = """Greetings.
+
+Jenkins development compose build $buildname pipeline has been failing for $failed_days days.
 
 Job URL: ${BUILD_URL}"""
-		        emailext to: failure_email_recipient,
-			    from: failure_email_sender,
-			    subject: failure_subject,
-			    body: failure_message
-
+                            emailext to: failure_email_recipient,
+                                from: failure_email_sender,
+                                subject: failure_subject,
+                                body: failure_message
+                        }
                         error 'Compose Failed'
                     }
                 }
             }
         }
-
     }
 }
