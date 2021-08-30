@@ -27,7 +27,7 @@ pipeline {
 
 		    echo "Jenkins build $buildname status = $buildstatus"
 
-                    if (buildstatus == 'FAILED') {
+                    if (buildstatus == 'FAIL') {
 		        def Message = "test message body"
 		        emailext to: "mmathesi@redhat.com",
 			    from: "merlinm-jenkins-test@redhat.com",
