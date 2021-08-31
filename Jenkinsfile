@@ -2,7 +2,6 @@ def failure_days_to_notify = 2
 def failure_email_sender = "merlinm-jenkins-test@redhat.com"
 def failure_email_recipient = "mmathesi@redhat.com"
 
-// import java.text.SimpleDateFormat
 import java.time.format.DateTimeFormatter
 import java.time.LocalDate
 
@@ -42,21 +41,17 @@ pipeline {
 
                         url = "$toplevel_url/../$compose_type/latest-CentOS-Stream/compose/metadata/composeinfo.json"
 
-                        echo "URL with compose details for last successful build of type $compose_type: $url"
+                        echo "URL with compose details for latest successful build of type $compose_type: $url"
 
                         def response = httpRequest url: url, outputFile: "composeinfo.json", ignoreSslErrors: true
                         def latest_composeinfo = readJSON file: "composeinfo.json"
                         def latest_composedate = latest_composeinfo["payload"]["compose"]["date"]
                         echo "Latest successful compose date: ${latest_composedate}"
 
-                        // def local_parsed_composedate = LocalDate.parse(latest_composedate, DateTimeFormatter.ofPattern("yyyyMMdd"))
-                        // echo "Local parsed compose date: ${local_parsed_composedate}"
-                        // echo "Local parsed compose date epoch: " + local_parsed_composedate.toEpochDay()
-
                         def compose_edays = LocalDate.parse(latest_composedate, DateTimeFormatter.ofPattern("yyyyMMdd")).toEpochDay()
                         def today_edays = LocalDate.now().toEpochDay()
                         failed_days = today_edays - compose_edays
-                        echo "Last successful compose was ${failed_days} days ago"
+                        echo "Latest successful compose was ${failed_days} days ago. Notification threshold is ${failure_days_to_notify} days."
 
                         if (failed_days >= failure_days_to_notify) {
                             def failure_subject = "Development compose $buildname pipeline has been failing for $failed_days days"
