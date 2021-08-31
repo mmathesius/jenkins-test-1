@@ -46,7 +46,7 @@ pipeline {
                         def latestcomposeinfo = readJSON file: "composeinfo.json"
                         echo "latestcomposeinfo: ${latestcomposeinfo}"
 
-                        def latest_date = latestcomposeinfo["latestcomposeinfo"]["payload"]
+                        def latest_date = latestcomposeinfo["payload"]["compose"]["date"]
                         echo "Latest compose date: ${latest_date}"
 
                         failed_days = 0
