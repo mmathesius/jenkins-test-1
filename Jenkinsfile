@@ -40,7 +40,7 @@ pipeline {
 
                         echo "URL with compose details for last successful build of type $compose_type: $url"
 
-                        def response = httpRequest url: url, outputFile: "composeinfo.json", ignoreSslErrors: True
+                        def response = httpRequest url: url, outputFile: "composeinfo.json", ignoreSslErrors: true
                         echo "URL fetch status: ${response.status}"
                         echo "URL download content:"
                         sh "cat composeinfo.json"
