@@ -58,13 +58,14 @@ pipeline {
                         echo "Local parsed compose date: ${local_parsed_composedate}"
                         echo "Local parsed compose date epoch: " + local_parsed_composedate.toEpochDay()
 
-                        // def compose_epochdate = LocalDate.toEpochDay(parsed_composedate)
-                        // echo "Epoch compose date: ${compose_epochdate}"
-                        def now_epochdays = LocalDate.now().toEpochDay()
-                        echo "Now epoch days ${now_epochdays}"
+                        def compose_edays = LocalDate.parse(latest_composedate, DateTimeFormatter.ofPattern("yyyyMMdd")).toEpochDay()
+                        echo "Compose epoch days: ${compose_edays}"
 
-                        // failed_days = toEpochDay(today) - toEpochDay(parsed_composedate)
-                        failed_days = 0
+                        def today_edays = LocalDate.now().toEpochDay()
+                        echo "Now epoch days ${today_edays}"
+
+                        failed_days = today_edays - compose_edays
+                        echo "Last successful compose was ${failed_days} ago"
 
                         if (failed_days >= failure_days_to_notify) {
                             def failure_subject = "Development compose $buildname pipeline has been failing for $failed_days days"
