@@ -3,6 +3,7 @@ def failure_email_sender = "merlinm-jenkins-test@redhat.com"
 def failure_email_recipient = "mmathesi@redhat.com"
 
 import java.text.SimpleDateFormat
+import java.time.LocalDate
 
 pipeline {
     agent {
@@ -49,7 +50,9 @@ pipeline {
 
                         def parsed_composedate = new SimpleDateFormat("yyyyMMdd").parse(latest_composedate)
                         echo "Parsed compose date: ${parsed_composedate}"
+                        echo "Epoch compose date: " + toEpochDay(parsed_composedate)
 
+                        // failed_days = toEpochDay(today) - toEpochDay(parsed_composedate)
                         failed_days = 0
 
                         if (failed_days >= failure_days_to_notify) {
