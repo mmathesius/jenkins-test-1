@@ -43,12 +43,12 @@ pipeline {
                         echo "URL with compose details for last successful build of type $compose_type: $url"
 
                         def response = httpRequest url: url, outputFile: "composeinfo.json", ignoreSslErrors: true
-                        def latestcomposeinfo = readJSON file: "composeinfo.json"
-                        def latest_date = latestcomposeinfo["payload"]["compose"]["date"]
-                        echo "Latest compose date: ${latest_date}"
+                        def latest_composeinfo = readJSON file: "composeinfo.json"
+                        def latest_composedate = latest_composeinfo["payload"]["compose"]["date"]
+                        echo "Latest compose date: ${latest_composedate}"
 
-                        def parsed_date = new SimpleDateFormat("yyyyMMdd").parse(date)
-                        echo "Parsed compose date: ${parsed_date}"
+                        def parsed_composedate = new SimpleDateFormat("yyyyMMdd").parse(latest_composedate)
+                        echo "Parsed compose date: ${parsed_composedate}"
 
                         failed_days = 0
 
