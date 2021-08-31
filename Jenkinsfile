@@ -50,7 +50,7 @@ pipeline {
 
                         def parsed_composedate = new SimpleDateFormat("yyyyMMdd").parse(latest_composedate)
                         echo "Parsed compose date: ${parsed_composedate}"
-                        echo "Epoch compose date: " + toEpochDay(parsed_composedate)
+                        echo "Epoch compose date: " + parsed_composedate.toEpochDay()
 
                         // failed_days = toEpochDay(today) - toEpochDay(parsed_composedate)
                         failed_days = 0
