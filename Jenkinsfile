@@ -60,7 +60,7 @@ pipeline {
 
                         // def compose_epochdate = LocalDate.toEpochDay(parsed_composedate)
                         // echo "Epoch compose date: ${compose_epochdate}"
-                        def now_epochdays = LocalDate.now().toEpochDays()
+                        def now_epochdays = LocalDate.now().toEpochDay()
                         echo "Now epoch days ${now_epochdays}"
 
                         // failed_days = toEpochDay(today) - toEpochDay(parsed_composedate)
