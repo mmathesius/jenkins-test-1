@@ -48,10 +48,12 @@ pipeline {
                         def latest_composedate = latest_composeinfo["payload"]["compose"]["date"]
                         echo "Latest compose date: ${latest_composedate}"
 
-                        def parsed_composedate = new SimpleDateFormat("yyyyMMdd").parse(latest_composedate)
+                        // def parsed_composedate = new SimpleDateFormat("yyyyMMdd").parse(latest_composedate)
+                        def date_fmt = new SimpleDateFormat("yyyyMMdd")
+                        // def parsed_composedate = date_fmt.parse(latest_composedate)
                         echo "Parsed compose date: ${parsed_composedate}"
-                        def compose_epochdate = LocalDate.toEpochDay(parsed_composedate)
-                        echo "Epoch compose date: ${compose_epochdate}"
+                        // def compose_epochdate = LocalDate.toEpochDay(parsed_composedate)
+                        // echo "Epoch compose date: ${compose_epochdate}"
 
                         // failed_days = toEpochDay(today) - toEpochDay(parsed_composedate)
                         failed_days = 0
