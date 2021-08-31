@@ -42,11 +42,9 @@ pipeline {
 
                         def response = httpRequest url: url, outputFile: "composeinfo.json", ignoreSslErrors: true
                         echo "URL fetch status: ${response.status}"
-                        echo "URL download content:"
-                        sh "cat composeinfo.json"
 
-                        // def json = new JsonSlurper().parseText(response.content)
-                        // echo "JSON: ${json}"
+                        def latestcomposeinfo = readJSON file: "composeinfo.json"
+                        echo "latestcomposeinfo: ${latestcomposeinfo}"
 
                         failed_days = 0
 
