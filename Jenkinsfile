@@ -2,6 +2,8 @@ def failure_days_to_notify = 2
 def failure_email_sender = "merlinm-jenkins-test@redhat.com"
 def failure_email_recipient = "mmathesi@redhat.com"
 
+import java.text.SimpleDateFormat
+
 pipeline {
     agent {
         label '!windows'
@@ -41,13 +43,12 @@ pipeline {
                         echo "URL with compose details for last successful build of type $compose_type: $url"
 
                         def response = httpRequest url: url, outputFile: "composeinfo.json", ignoreSslErrors: true
-                        echo "URL fetch status: ${response.status}"
-
                         def latestcomposeinfo = readJSON file: "composeinfo.json"
-                        echo "latestcomposeinfo: ${latestcomposeinfo}"
-
                         def latest_date = latestcomposeinfo["payload"]["compose"]["date"]
                         echo "Latest compose date: ${latest_date}"
+
+                        def parsed_date = new SimpleDateFormat("yyyyMMdd").parse(date)
+                        echo "Parsed compose date: ${parsed_date}"
 
                         failed_days = 0
 
