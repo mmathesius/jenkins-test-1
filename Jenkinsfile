@@ -46,6 +46,9 @@ pipeline {
                         def latestcomposeinfo = readJSON file: "composeinfo.json"
                         echo "latestcomposeinfo: ${latestcomposeinfo}"
 
+                        def latest_date = latestcomposeinfo["latestcomposeinfo"]["payload"]
+                        echo "Latest compose date: ${latest_date}"
+
                         failed_days = 0
 
                         if (failed_days >= failure_days_to_notify) {
