@@ -3,6 +3,7 @@ def failure_email_sender = "merlinm-jenkins-test@redhat.com"
 def failure_email_recipient = "mmathesi@redhat.com"
 
 import java.text.SimpleDateFormat
+import java.time.format.DateTimeFormatter
 import java.time.LocalDate
 
 pipeline {
