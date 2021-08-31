@@ -54,8 +54,9 @@ pipeline {
                         // def parsed_composedate = date_fmt.parse(latest_composedate)
                         // echo "Parsed compose date: ${parsed_composedate}"
 
-                        def dtf = DateTimeFormatter.ofPattern("yyyyMMdd")
-                        def local_parsed_composedate = LocalDate.parse(latest_composedate, dtf)
+                        // def dtf = DateTimeFormatter.ofPattern("yyyyMMdd")
+                        // def local_parsed_composedate = LocalDate.parse(latest_composedate, dtf)
+                        def local_parsed_composedate = LocalDate.parse(latest_composedate, DateTimeFormatter.ofPattern("yyyyMMdd"))
                         echo "Local parsed compose date: ${local_parsed_composedate}"
                         echo "Local parsed compose date epoch: " + local_parsed_composedate.toEpochDay()
 
