@@ -2,7 +2,7 @@ def failure_days_to_notify = 2
 def failure_email_sender = "merlinm-jenkins-test@redhat.com"
 def failure_email_recipient = "mmathesi@redhat.com"
 
-import java.text.SimpleDateFormat
+// import java.text.SimpleDateFormat
 import java.time.format.DateTimeFormatter
 import java.time.LocalDate
 
@@ -49,14 +49,15 @@ pipeline {
                         def latest_composedate = latest_composeinfo["payload"]["compose"]["date"]
                         echo "Latest compose date: ${latest_composedate}"
 
-                        // def parsed_composedate = new SimpleDateFormat("yyyyMMdd").parse(latest_composedate)
-                        def date_fmt = new SimpleDateFormat("yyyyMMdd")
-                        def parsed_composedate = date_fmt.parse(latest_composedate)
-                        echo "Parsed compose date: ${parsed_composedate}"
+                        // // def parsed_composedate = new SimpleDateFormat("yyyyMMdd").parse(latest_composedate)
+                        // def date_fmt = new SimpleDateFormat("yyyyMMdd")
+                        // def parsed_composedate = date_fmt.parse(latest_composedate)
+                        // echo "Parsed compose date: ${parsed_composedate}"
 
                         def dtf = DateTimeFormatter.ofPattern("yyyyMMdd")
                         def local_parsed_composedate = LocalDate.parse(latest_composedate, dtf)
                         echo "Local parsed compose date: ${local_parsed_composedate}"
+                        echo "Local parsed compose date epoch: " + local_parsed_composedate.toEpochDay()
 
                         // def compose_epochdate = LocalDate.toEpochDay(parsed_composedate)
                         // echo "Epoch compose date: ${compose_epochdate}"
