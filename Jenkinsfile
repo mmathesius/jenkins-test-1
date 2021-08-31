@@ -39,18 +39,17 @@ pipeline {
                         def toplevel_url = composeattrs['toplevel_url']
                         def compose_type = composeattrs['compose_type']
 
-                        url = "$toplevel_url/../$compose_type/latest-CentOS-Stream/compose/metadata/composeinfo.json"
-
-                        echo "URL with compose details for latest successful build of type $compose_type: $url"
-
+                        def url = "$toplevel_url/../$compose_type/latest-CentOS-Stream/compose/metadata/composeinfo.json"
                         def response = httpRequest url: url, outputFile: "composeinfo.json", ignoreSslErrors: true
                         def latest_composeinfo = readJSON file: "composeinfo.json"
                         def latest_composedate = latest_composeinfo["payload"]["compose"]["date"]
+
                         echo "Latest successful compose date: ${latest_composedate}"
 
                         def compose_edays = LocalDate.parse(latest_composedate, DateTimeFormatter.ofPattern("yyyyMMdd")).toEpochDay()
                         def today_edays = LocalDate.now().toEpochDay()
-                        failed_days = today_edays - compose_edays
+                        def failed_days = today_edays - compose_edays
+
                         echo "Latest successful compose was ${failed_days} days ago. Notification threshold is ${failure_days_to_notify} days."
 
                         if (failed_days >= failure_days_to_notify) {
