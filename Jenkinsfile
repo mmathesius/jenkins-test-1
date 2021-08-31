@@ -54,14 +54,14 @@ pipeline {
                         // def parsed_composedate = date_fmt.parse(latest_composedate)
                         // echo "Parsed compose date: ${parsed_composedate}"
 
-                        // def dtf = DateTimeFormatter.ofPattern("yyyyMMdd")
-                        // def local_parsed_composedate = LocalDate.parse(latest_composedate, dtf)
                         def local_parsed_composedate = LocalDate.parse(latest_composedate, DateTimeFormatter.ofPattern("yyyyMMdd"))
                         echo "Local parsed compose date: ${local_parsed_composedate}"
                         echo "Local parsed compose date epoch: " + local_parsed_composedate.toEpochDay()
 
                         // def compose_epochdate = LocalDate.toEpochDay(parsed_composedate)
                         // echo "Epoch compose date: ${compose_epochdate}"
+                        def now_epochdays = LocalDate.now().toEpochDays()
+                        echo "Now epoch days ${now_epochdays}"
 
                         // failed_days = toEpochDay(today) - toEpochDay(parsed_composedate)
                         failed_days = 0
