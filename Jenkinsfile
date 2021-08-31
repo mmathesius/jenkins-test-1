@@ -40,11 +40,13 @@ pipeline {
 
                         echo "URL with compose details for last successful build of type $compose_type: $url"
 
-                        def response = httpRequest url
+                        def response = httpRequest url, outfile: "composeinfo.json"
                         echo "URL fetch status: ${response.status}"
+                        echo "URL download content:"
+                        sh "cat composeinfo.json"
 
-                        def json = new JsonSlurper().parseText(response.content)
-                        echo "JSON: ${json}"
+                        // def json = new JsonSlurper().parseText(response.content)
+                        // echo "JSON: ${json}"
 
                         failed_days = 0
 
