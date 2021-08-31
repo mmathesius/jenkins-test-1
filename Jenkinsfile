@@ -52,6 +52,10 @@ pipeline {
                         def date_fmt = new SimpleDateFormat("yyyyMMdd")
                         def parsed_composedate = date_fmt.parse(latest_composedate)
                         echo "Parsed compose date: ${parsed_composedate}"
+
+                        def local_parsed_composedate = LocalDate.parse(latest_composedate, date_fmt)
+                        echo "Local parsed compose date: ${local_parsed_composedate}"
+
                         // def compose_epochdate = LocalDate.toEpochDay(parsed_composedate)
                         // echo "Epoch compose date: ${compose_epochdate}"
 
