@@ -1,4 +1,4 @@
-def failure_days_to_notify = 2
+def failure_days_to_notify = 0
 def failure_email_sender = "Compose Alert <compose-alert@centos.org>"
 def failure_email_recipient = "mmathesi@redhat.com"
 
