@@ -17,6 +17,7 @@ pipeline {
         stage('Generate compose report') {
             steps {
                 script {
+                    echo ">> REPORT GOES HERE <<<"
                 }
             }
         }
