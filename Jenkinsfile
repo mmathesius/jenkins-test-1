@@ -1,6 +1,6 @@
 pipeline {
     agent {
-        label 'compose'
+        label '!windows'
     }
 
     environment {
