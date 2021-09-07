@@ -24,18 +24,20 @@ pipeline {
         stage('Generate compose report') {
             steps {
                 script {
+                    today_edays = LocalDate.now().toEpochDay()
+
                     for (compose_type in compose_types) {
                         echo ">> $compose_type REPORT GOES HERE <<<"
-                        url = "$compose_topurl/$compose_type/latest-$compose_release/compose/metadata/composeinfo.json"
-                        response = httpRequest url: url, outputFile: "composeinfo.json", ignoreSslErrors: true
+                        latest_composeurl = "$compose_topurl/$compose_type/latest-$compose_release"
+                        composeinfo_url = "$latest_composeurl/compose/metadata/composeinfo.json"
+                        response = httpRequest composeinfo_url: url, outputFile: "composeinfo.json", ignoreSslErrors: true
                         latest_composeinfo = readJSON file: "composeinfo.json"
                         latest_composeid = latest_composeinfo["payload"]["compose"]["id"]
                         latest_composedate = latest_composeinfo["payload"]["compose"]["date"]
 
-                        echo "Latest successful $compose_type $latest_composeid compose date: $latest_composedate"
+                        echo "Latest successful $compose_type compose $latest_composeid date: $latest_composedate"
 
                         compose_edays = LocalDate.parse(latest_composedate, DateTimeFormatter.ofPattern("yyyyMMdd")).toEpochDay()
-                        today_edays = LocalDate.now().toEpochDay()
                         failed_days = today_edays - compose_edays
 
                         echo "Latest successful $compose_type compose $latest_composeid was $failed_days days ago."
