@@ -1,14 +1,18 @@
 import java.time.format.DateTimeFormatter
 import java.time.LocalDate
 
+def compose_topurl = 'https://odcs.stream.rdu2.redhat.com/composes'
+def compose_types = ['production', 'development'] as Set
+def compose_release = 'CentOS-Stream'
+
 pipeline {
     agent {
         label '!windows'
     }
 
     environment {
-        VARIABLE     = 'value'
     }
+    // VARIABLE     = 'value'
 
     stages {
         stage('Setup') {
@@ -20,7 +24,11 @@ pipeline {
         stage('Generate compose report') {
             steps {
                 script {
-                    echo ">> REPORT GOES HERE <<<"
+                    for (compose_type in compose_types) {
+                        echo ">> $compose_type REPORT GOES HERE <<<"
+                        url = "$compose_topurl/$compose_type/latest-$compose_release"
+                        echo "Compose URL is $url"
+                    }
                 }
             }
         }
@@ -35,7 +43,7 @@ pipeline {
 
                     echo "Build $buildname status: $buildstatus"
 
-                    if (buildstatus == 'FAIL') {
+                    if (false && buildstatus == 'FAIL') {
                         // track down details for last successful compose
                         def toplevel_url = composeattrs['toplevel_url']
                         def compose_type = composeattrs['compose_type']
