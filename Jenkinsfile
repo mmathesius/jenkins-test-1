@@ -11,16 +11,10 @@ pipeline {
     }
 
     stages {
-        stage('Setup') {
-            steps {
-                sh 'printenv'
-            }
-        }
-
         stage('Generate compose report') {
             steps {
                 script {
-                  sh "./scripts/last_good/report.py"
+                    sh "./scripts/last_good/report.py"
                 }
             }
         }
