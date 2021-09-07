@@ -15,10 +15,15 @@ SCRIPTPATH = os.path.dirname(os.path.realpath(__file__))
 
 
 def report():
+
     today = datetime.date.today()
 
+    results = {}
+    results["today"] = str(today)
+    results["compose_types"] = {}
+
     for compose_type in COMPOSE_TYPES:
-        logging.debug(">> {} REPORT GOES HERE <<<".format(compose_type))
+        logging.debug("Working on compose_type {}".format(compose_type))
 
         latest_composeurl = "{topurl}/{type}/latest-{release}".format(
             topurl=COMPOSE_TOPURL, type=compose_type, release=COMPOSE_RELEASE
@@ -43,13 +48,30 @@ def report():
         latest_composeid = latest_composeinfo["payload"]["compose"]["id"]
         latest_composedate = latest_composeinfo["payload"]["compose"]["date"]
 
-        logging.info("Latest successful {type} compose {id} date: {date}".format(type=compose_type, id=latest_composeid, date=latest_composedate))
+        logging.info(
+            "Latest successful {type} compose {id} date: {date}".format(
+                type=compose_type, id=latest_composeid, date=latest_composedate
+            )
+        )
 
-        parsed_date = datetime.datetime.strptime(latest_composedate, "%Y%m%d")
-        logging.debug("Parsed date: {date}".format(date=parsed_date.date()))
+        parsed_date = datetime.datetime.strptime(latest_composedate, "%Y%m%d").date()
+        logging.debug("Parsed date: {date}".format(date=parsed_date))
 
-        failed_days = (today - parsed_date.date()).days
-        logging.info("Latest successful {type} compose {id} was {ago} days ago.".format(type=compose_type, id=latest_composeid, ago=failed_days))
+        failed_days = (today - parsed_date).days
+        logging.info(
+            "Latest successful {type} compose {id} was {age} days ago.".format(
+                type=compose_type, id=latest_composeid, age=failed_days
+            )
+        )
+
+        results["compose_types"][compose_type] = {
+            "id": latest_composeid,
+            "link": latest_composeurl,
+            "date": str(parsed_date),
+            "age": failed_days,
+        }
+
+    print("results = {}".format(pprint.pformat(results)))
 
 
 if __name__ == "__main__":
