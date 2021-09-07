@@ -10,9 +10,9 @@ pipeline {
         label '!windows'
     }
 
-    environment {
-    }
-    // VARIABLE     = 'value'
+    // environment {
+    //     VARIABLE     = 'value'
+    // }
 
     stages {
         stage('Setup') {
