@@ -64,9 +64,13 @@ def report():
             )
         )
 
+        real_composeurl = "{topurl}/{type}/{id}".format(
+            topurl=COMPOSE_TOPURL, type=compose_type, id=latest_composeid
+        )
+
         results["compose_types"][compose_type] = {
             "id": latest_composeid,
-            "link": latest_composeurl,
+            "link": real_composeurl,
             "date": str(parsed_date),
             "age": failed_days,
         }
