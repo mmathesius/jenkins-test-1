@@ -30,7 +30,7 @@ pipeline {
                         echo ">> $compose_type REPORT GOES HERE <<<"
                         latest_composeurl = "$compose_topurl/$compose_type/latest-$compose_release"
                         composeinfo_url = "$latest_composeurl/compose/metadata/composeinfo.json"
-                        response = httpRequest composeinfo_url: url, outputFile: "composeinfo.json", ignoreSslErrors: true
+                        response = httpRequest url: composeinfo_url, outputFile: "composeinfo.json", ignoreSslErrors: true
                         latest_composeinfo = readJSON file: "composeinfo.json"
                         latest_composeid = latest_composeinfo["payload"]["compose"]["id"]
                         latest_composedate = latest_composeinfo["payload"]["compose"]["date"]
