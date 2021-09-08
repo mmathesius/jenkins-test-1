@@ -49,9 +49,9 @@ def report():
         latest_composeid = latest_composeinfo["payload"]["compose"]["id"]
         latest_composedate = latest_composeinfo["payload"]["compose"]["date"]
 
-        logging.info(
-            "Latest successful {type} compose {id} date: {date}".format(
-                type=compose_type, id=latest_composeid, date=latest_composedate
+        logging.debug(
+            "compose {id} date {date}".format(
+                id=latest_composeid, date=latest_composedate
             )
         )
 
@@ -60,8 +60,8 @@ def report():
 
         failed_days = (today - parsed_date).days
         logging.info(
-            "Latest successful {type} compose {id} was {age} days ago.".format(
-                type=compose_type, id=latest_composeid, age=failed_days
+            "Latest successful {type} compose {id} was on {date} ({age} days ago).".format(
+                type=compose_type, id=latest_composeid, date=parsed_date, age=failed_days
             )
         )
 
@@ -76,7 +76,7 @@ def report():
             "age": failed_days,
         }
 
-    print("results = {}".format(pprint.pformat(results)))
+    logging.debug("results = {}".format(pprint.pformat(results)))
 
     render(results, tmpl_path=os.path.join(SCRIPTPATH, "templates"))
 
