@@ -2,6 +2,7 @@
 
 import argparse
 import datetime
+import jinja2
 import logging
 import os
 import pprint
@@ -15,11 +16,11 @@ SCRIPTPATH = os.path.dirname(os.path.realpath(__file__))
 
 
 def report():
-
     today = datetime.date.today()
 
     results = {}
     results["today"] = str(today)
+    results["release"] = COMPOSE_RELEASE
     results["compose_types"] = {}
 
     for compose_type in COMPOSE_TYPES:
@@ -76,6 +77,27 @@ def report():
         }
 
     print("results = {}".format(pprint.pformat(results)))
+
+    render(results, tmpl_path=os.path.join(SCRIPTPATH, "templates"))
+
+
+def render(results, tmpl_path="templates", output_path="output", fmt="all"):
+    os.makedirs(output_path, exist_ok=True)
+
+    j2_env = jinja2.Environment(loader=jinja2.FileSystemLoader(tmpl_path))
+    templates = j2_env.list_templates(extensions="j2")
+    logging.debug("Templates to render found in {}: {}".format(tmpl_path, templates))
+    if fmt != "all":
+        fmtlist = fmt.split(",")
+        templates = [name for name in templates if name.split(".")[-2] in fmtlist]
+    for tmpl_name in templates:
+        tmpl = j2_env.get_template(tmpl_name)
+        tmpl.stream(results=results).dump(
+            os.path.join(
+                output_path,
+                tmpl_name[:-3],
+            )
+        )
 
 
 if __name__ == "__main__":
