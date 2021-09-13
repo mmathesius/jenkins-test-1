@@ -20,6 +20,28 @@ pipeline {
             }
         }
 
+        stage('Hang') {
+            steps {
+                // timeout(time: 120, unit: 'MINUTES') {
+                timeout(time: 10, unit: 'SECONDS') {
+                    script {
+                        while( true ){
+                            sleep 60 // seconds
+                            // sh "curl --negotiate -u : -o response.json https://odcs.stream.rdu2.redhat.com/api/1/composes/$composeid"
+
+                            def composeattrs = readJSON file: 'response.json'
+
+                            if (composeattrs['state'] == 2) { //done
+                                return
+                            } else if (composeattrs['state'] == 4) { //failed
+                                return
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
         stage('Report Compose result') {
             steps {
                 script {
