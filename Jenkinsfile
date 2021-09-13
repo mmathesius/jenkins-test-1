@@ -5,6 +5,7 @@ pipeline {
 
     triggers {
         cron('H/10 * * * *')
+        upstream(upstreamProjects: "My-Pipeline/compose-report")
     }
 
     stages {
