@@ -30,7 +30,7 @@ pipeline {
                         buildstatus = 'UNKNOWN'
                         Exception caughtException = null
 
-                        catchError(buildResult: 'SUCCESS', stageResult: 'ABORTED') {
+                        catchError(buildResult: null, stageResult: 'ABORTED') {
                             try {
                                 while( true ) {
                                     sleep 60 // seconds
@@ -52,11 +52,11 @@ pipeline {
                             } catch (Throwable e) {
                                 caughtException e
                             }
-
-                            if (caughtException) {
-                                error caughtException.message
-                            }
                         } // catchError()
+
+                        if (caughtException) {
+                            error caughtException.message
+                        }
                     }
                 } // timeout()
             }
