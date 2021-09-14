@@ -1,5 +1,7 @@
 def failure_email_sender = "merlinm-jenkins-test@redhat.com"
 def failure_email_recipient = "mmathesi@redhat.com"
+def composeattrs = null
+def buildstatus = "UNKNOWN"
 
 pipeline {
     agent {
@@ -29,11 +31,13 @@ pipeline {
                             sleep 60 // seconds
                             // sh "curl --negotiate -u : -o response.json https://odcs.stream.rdu2.redhat.com/api/1/composes/$composeid"
 
-                            def composeattrs = readJSON file: 'response.json'
+                            composeattrs = readJSON file: 'response.json'
 
                             if (composeattrs['state'] == 2) { //done
+                                buildstatus = 'SUCCESS'
                                 return
                             } else if (composeattrs['state'] == 4) { //failed
+                                buildstatus = 'FAIL'
                                 return
                             }
                         }
@@ -45,10 +49,11 @@ pipeline {
         stage('Report Compose result') {
             steps {
                 script {
-                    def composeattrs = readJSON file: 'response.json'
-                    def buildname = composeattrs['pungi_compose_id']
-                    def buildstatus = (composeattrs['state'] == 4) ? 'FAIL' : 'SUCCESS'
-                    currentBuild.displayName = "$buildname"
+                    def buildname = "unknown-build"
+                    if (composeattrs)
+                        buildname = composeattrs['pungi_compose_id']
+                        currentBuild.displayName = "$buildname"
+                    }
 
 		    echo "Jenkins build $buildname status = $buildstatus"
 
