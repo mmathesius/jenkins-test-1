@@ -24,7 +24,7 @@ pipeline {
 
         stage('Hang') {
             steps {
-                // timeout(time: 120, unit: 'MINUTES') {
+                // timeout(time: 120, unit: 'MINUTES')
                 timeout(time: 10, unit: 'SECONDS') {
                     script {
                         while( true ){
@@ -50,7 +50,7 @@ pipeline {
             steps {
                 script {
                     def buildname = "unknown-build"
-                    if (composeattrs)
+                    if (composeattrs) {
                         buildname = composeattrs['pungi_compose_id']
                         currentBuild.displayName = "$buildname"
                     }
@@ -74,6 +74,5 @@ Job URL: ${BUILD_URL}"""
                 }
             }
         }
-
     }
 }
