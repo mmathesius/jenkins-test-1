@@ -1,7 +1,7 @@
 def failure_email_sender = "merlinm-jenkins-test@redhat.com"
 def failure_email_recipient = "mmathesi@redhat.com"
 def composeattrs = null
-def buildstatus = "UNKNOWN"
+def buildstatus = 'UNKNOWN'
 
 pipeline {
     agent {
@@ -27,7 +27,7 @@ pipeline {
                 // timeout(time: 120, unit: 'MINUTES')
                 timeout(time: 10, unit: 'SECONDS') {
                     script {
-                        buildstatus = "UNKNOWN"
+                        buildstatus = 'UNKNOWN'
                         Exception caughtException = null
 
                         catchError(buildResult: 'SUCCESS', stageResult: 'ABORTED') {
@@ -62,7 +62,7 @@ pipeline {
             }
         } // stage()
 
-        stage('Report Compose result') {
+        stage('Report Compose Result') {
             steps {
                 script {
                     def buildname = "unknown-build"
@@ -85,7 +85,7 @@ Job URL: ${BUILD_URL}"""
 			    subject: failure_subject,
 			    body: failure_message
 
-                        error 'Compose Status $buildstatus'
+                        error "Compose Status $buildstatus"
                     }
                 }
             }
