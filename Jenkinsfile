@@ -47,7 +47,7 @@ pipeline {
                                 }
                             } catch (org.jenkinsci.plugins.workflow.steps.FlowInterruptedException e) {
                                 error "Caught ${e.toString()}"
-                            } catch (Throrwable e) {
+                            } catch (Throwable e) {
                                 caughtException e
                             }
 
