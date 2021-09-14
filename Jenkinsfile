@@ -25,7 +25,7 @@ pipeline {
         stage('Hang') {
             steps {
                 // timeout(time: 120, unit: 'MINUTES')
-                timeout(time: 10, unit: 'SECONDS') {
+                timeout(time: 90, unit: 'SECONDS') {
                     script {
                         buildstatus = 'UNKNOWN'
                         Exception caughtException = null
