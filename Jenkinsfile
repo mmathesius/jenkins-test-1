@@ -22,7 +22,7 @@ pipeline {
             }
         }
 
-        stage('Hang') {
+        stage('Wait for Compose to finish'){
             steps {
                 // timeout(time: 120, unit: 'MINUTES')
                 timeout(time: 90, unit: 'SECONDS') {
