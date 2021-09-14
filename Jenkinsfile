@@ -27,24 +27,38 @@ pipeline {
                 // timeout(time: 120, unit: 'MINUTES')
                 timeout(time: 10, unit: 'SECONDS') {
                     script {
-                        while( true ){
-                            sleep 60 // seconds
-                            // sh "curl --negotiate -u : -o response.json https://odcs.stream.rdu2.redhat.com/api/1/composes/$composeid"
+                        Exception caughtException = null
 
-                            composeattrs = readJSON file: 'response.json'
+                        catchError(buildResult: 'SUCCESS', stageResult: 'ABORTED') {
+                            try {
+                                while( true ) {
+                                    sleep 60 // seconds
+                                    // sh "curl --negotiate -u : -o response.json https://odcs.stream.rdu2.redhat.com/api/1/composes/$composeid"
 
-                            if (composeattrs['state'] == 2) { //done
-                                buildstatus = 'SUCCESS'
-                                return
-                            } else if (composeattrs['state'] == 4) { //failed
-                                buildstatus = 'FAIL'
-                                return
+                                    composeattrs = readJSON file: 'response.json'
+
+                                    if (composeattrs['state'] == 2) { //done
+                                        buildstatus = 'SUCCESS'
+                                        return
+                                    } else if (composeattrs['state'] == 4) { //failed
+                                        buildstatus = 'FAIL'
+                                        return
+                                    }
+                                }
+                            } catch (org.jenkinsci.plugins.workflow.steps.FlowInterruptedException e) {
+                                error "Caught ${e.toString()}"
+                            } catch (Throrwable e) {
+                                caughtException e
                             }
-                        }
+
+                            if (caughtException) {
+                                error caughtException.message
+                            }
+                        } // catchError()
                     }
-                }
+                } // timeout()
             }
-        }
+        } // stage()
 
         stage('Report Compose result') {
             steps {
