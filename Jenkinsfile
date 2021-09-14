@@ -73,19 +73,19 @@ pipeline {
                         currentBuild.displayName = "$buildname"
                     }
 
-		    echo "Jenkins build $buildname status = $buildstatus"
+                    echo "Build $buildname status: $buildstatus"
 
                     if (buildstatus != 'SUCCESS') {
-		        def failure_subject = "Production compose $buildname status: $buildstatus!"
-		        def failure_message = """Greetings.
+                        def failure_subject = "Production compose $buildname status: $buildstatus!"
+                        def failure_message = """Greetings.
 
 Jenkins production compose build $buildname status is $buildstatus.
 
 Job URL: ${BUILD_URL}"""
-		        emailext to: failure_email_recipient,
-			    from: failure_email_sender,
-			    subject: failure_subject,
-			    body: failure_message
+                        emailext to: failure_email_recipient,
+                            from: failure_email_sender,
+                            subject: failure_subject,
+                            body: failure_message
 
                         error "Compose Status $buildstatus"
                     }
