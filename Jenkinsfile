@@ -27,6 +27,7 @@ pipeline {
                 // timeout(time: 120, unit: 'MINUTES')
                 timeout(time: 10, unit: 'SECONDS') {
                     script {
+                        buildstatus = "UNKNOWN"
                         Exception caughtException = null
 
                         catchError(buildResult: 'SUCCESS', stageResult: 'ABORTED') {
@@ -46,6 +47,7 @@ pipeline {
                                     }
                                 }
                             } catch (org.jenkinsci.plugins.workflow.steps.FlowInterruptedException e) {
+                                buildstatus = 'TIMEOUT'
                                 error "Caught ${e.toString()}"
                             } catch (Throwable e) {
                                 caughtException e
@@ -71,11 +73,11 @@ pipeline {
 
 		    echo "Jenkins build $buildname status = $buildstatus"
 
-                    if (buildstatus == 'FAIL') {
-		        def failure_subject = "Production compose $buildname has FAILED!"
+                    if (buildstatus != 'SUCCESS') {
+		        def failure_subject = "Production compose $buildname status: $buildstatus!"
 		        def failure_message = """Greetings.
 
-Jenkins production compose build $buildname has failed.
+Jenkins production compose build $buildname status is $buildstatus.
 
 Job URL: ${BUILD_URL}"""
 		        emailext to: failure_email_recipient,
@@ -83,7 +85,7 @@ Job URL: ${BUILD_URL}"""
 			    subject: failure_subject,
 			    body: failure_message
 
-                        error 'Compose Failed'
+                        error 'Compose Status $buildstatus'
                     }
                 }
             }
