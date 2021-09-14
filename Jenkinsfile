@@ -30,6 +30,7 @@ pipeline {
                         buildstatus = 'UNKNOWN'
                         Exception caughtException = null
 
+                        // if an error occurs, abort this stage without failing the build
                         catchError(buildResult: null, stageResult: 'ABORTED') {
                             try {
                                 while( true ) {
@@ -50,10 +51,11 @@ pipeline {
                                 buildstatus = 'TIMEOUT'
                                 error "Caught ${e.toString()}"
                             } catch (Throwable e) {
-                                caughtException e
+                                caughtException = e
                             }
                         } // catchError()
 
+                        // if an unexpected exception occurred, go ahead and fail the build
                         if (caughtException) {
                             error caughtException.message
                         }
