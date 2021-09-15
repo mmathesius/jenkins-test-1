@@ -74,7 +74,7 @@ pipeline {
                     echo "Build $buildname status: $buildstatus"
 
                     if (buildstatus != 'SUCCESS') {
-                        // track down details for last successful compose
+                        // track down details for latest successful compose
                         def toplevel_url = composeattrs['toplevel_url']
                         def compose_type = composeattrs['compose_type']
 
@@ -104,7 +104,7 @@ Job URL: ${BUILD_URL}"""
                                 subject: failure_subject,
                                 body: failure_message
                         }
-                        error 'Compose Status $buildstatus'
+                        error "Compose Status $buildstatus"
                     }
                 }
             }
