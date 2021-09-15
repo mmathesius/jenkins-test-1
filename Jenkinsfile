@@ -73,7 +73,7 @@ pipeline {
 
                     echo "Build $buildname status: $buildstatus"
 
-                    if (buildstatus != 'FAIL') {
+                    if (buildstatus != 'SUCCESS') {
                         // track down details for last successful compose
                         def toplevel_url = composeattrs['toplevel_url']
                         def compose_type = composeattrs['compose_type']
