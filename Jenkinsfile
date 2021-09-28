@@ -10,7 +10,8 @@ pipeline {
                     try {
                         copyArtifacts(projectName: currentBuild.projectName, filter: "status.yaml")
                     } catch(err) {
-                        // ignore error
+                        // create empty file if missing
+                        sh "touch status.yaml"
                     }
                     sh "pwd"
                     sh "ls -l"
