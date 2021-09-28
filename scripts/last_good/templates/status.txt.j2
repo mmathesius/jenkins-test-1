@@ -1,5 +1,0 @@
-Release: {{ results["release"] }}
-Updated: {{ results["today"] }}
-{% for compose_type, compose_status in results["compose_types"].items() -%}
-{{ compose_type }} {{ compose_status["id"] }} {{ compose_status["date"] }} {{ compose_status["age"] }} <{{ compose_status["link"] }}>
-{% endfor -%}
