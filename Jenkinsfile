@@ -7,7 +7,11 @@ pipeline {
         stage('Generate compose report') {
             steps {
                 script {
-                    copyArtifacts(projectName: currentBuild.projectName, filter: "status.yaml")
+                    try {
+                        copyArtifacts(projectName: currentBuild.projectName, filter: "status.yaml")
+                    } catch(err) {
+                        // ignore error
+                    }
                     sh "pwd"
                     sh "ls -l"
                     sh "cat status.yaml"
