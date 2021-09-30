@@ -4,7 +4,7 @@ pipeline {
     }
 
     stages {
-        stage('Generate compose report') {
+        stage('Generate compose report and alerts') {
             steps {
                 script {
                     // get status.yaml artifact from previous run
@@ -14,8 +14,8 @@ pipeline {
                         // create empty file if missing
                         sh "touch status.yaml"
                     }
-                    sh "mv status.yaml oldstatus.yaml"
-                    sh "./scripts/compose_monitor/compose-check.py --debug --config scripts/compose_monitor/config-eln.yaml --input oldstatus.yaml"
+                    sh "mv status.yaml status-prev.yaml"
+                    sh "./scripts/compose_monitor/compose_check.py --debug --config scripts/compose_monitor/config.yaml --input status-prev.yaml"
                 }
             }
         }

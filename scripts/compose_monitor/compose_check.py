@@ -8,6 +8,7 @@ import logging
 import os
 import pprint
 import re
+import subprocess
 import sys
 import urllib.request
 import yaml
@@ -149,6 +150,199 @@ def get_compose_result(url, name, version, description, today):
     return result
 
 
+def find_compose_result(compose, results):
+    """
+    Find result in `results` that matches `url`, `name`, and `version` from `compose`
+
+    :param compose: dict containing compose-specific configuration
+    :param results: dict containing all compose results
+    :return: matching compose entry from `results`, else None
+    """
+    if results is None:
+        return None
+
+    for comp in results["composes"]:
+        if (
+            comp["url"] == compose["url"]
+            and comp["name"] == compose["name"]
+            and comp["version"] == compose["version"]
+        ):
+            return comp
+
+    return None
+
+
+def get_compose_config_prop(prop, conf, compose):
+    """
+    Get a compose configuration property, also checking the defaults.
+
+    :param prop: property name to get
+    :param conf: dict containing configuration
+    :param compose: dict containing compose-specific configuration
+    """
+    val = compose.get(prop)
+    if val is None:
+        try:
+            val = conf["defaults"][prop]
+        except:
+            pass
+    return val
+
+
+def send_email(sender, to, subject, body):
+    """
+    Send an e-mail message
+
+    :param sender:
+    :param to: list of e-mail recipients
+    :param subject:
+    :param body:
+    """
+    logger.debug("Sending e-mail from {} to {}".format(sender, to))
+    logger.debug("Subject: {}".format(subject))
+    logger.debug("Body: {}".format(body))
+
+    cmd = ["mail"]
+    cmd.extend(["-S", "from=" + sender])
+    cmd.extend(["-r", sender])
+    cmd.extend(["-s", subject])
+    cmd.extend([",".join(to)])
+
+    logger.debug("Command to send email: {}".format(cmd))
+    subprocess.run(cmd, input=body.encode("utf-8"))
+
+
+def send_alert(result, alert_days, email_sender, email_to, extra=None):
+    """
+    Generate and send an alert for the provided compose result
+
+    :param result: dict of compose status result properties
+    :param alert_days: threshold for number of days before alerting
+    :param email_sender: e-mail sender
+    :param email_to: list of e-mail recipients
+    :param extra: optional extra text to include in alert e-mail
+    """
+    logger.info(
+        "Sending compose {} alert to {} from {}".format(
+            result["description"], email_to, email_sender
+        )
+    )
+
+    fmt = {}
+    fmt["description"] = result["description"]
+    fmt["alert_days"] = alert_days
+
+    for what in ["latest_attempted", "latest_finished", "latest_incomplete"]:
+        for prop in ["age", "date", "id", "url"]:
+            fmt[what + "_" + prop] = result[what].get(prop, "unknown-" + prop)
+
+    if extra:
+        fmt["extra"] = "\nAdditional details:\n{}\n".format(extra)
+    else:
+        fmt["extra"] = ""
+
+    subject = "[COMPOSE FAILURE] {description} has not finished for {latest_finished_age} days".format(
+        **fmt
+    )
+    message = """Greetings.
+
+{description} has not finished successfully since {latest_finished_date} ({latest_finished_age} days ago)."
+
+You are receiving this message because the configured alert threshold of {alert_days} days has been reached.
+
+Latest finished compose was {latest_finished_id} on {latest_finished_date} ({latest_finished_age} days ago).
+    Link: {latest_finished_url}
+
+Latest incomplete compose was {latest_incomplete_id} on {latest_incomplete_date} ({latest_incomplete_age} days ago).
+    Link: {latest_incomplete_url}
+
+Latest attempted compose was {latest_attempted_id} on {latest_attempted_date} ({latest_attempted_age} days ago).
+    Link: {latest_attempted_url}
+{extra}""".format(
+        **fmt
+    )
+
+    send_email(email_sender, email_to, subject, message)
+
+
+def alerts(conf, results, old_results):
+    """
+    Send alerts as per configuration
+
+    :param conf: dictionary containing configuration
+    :param results: status results for configured composes
+    :param old_results: status results for configured composes from previous run
+    """
+    logger.info("Sending alerts")
+
+    today = results["date"]
+
+    for compose in conf["composes"]:
+        logger.info("Processing alert for {} compose".format(compose["description"]))
+        email_to = get_compose_config_prop("email_to", conf, compose)
+        logger.info("E-mail recipients: {}".format(email_to))
+        if not email_to:
+            logger.info("No e-mail recipients; skipping")
+            continue
+
+        logger.debug("Looking for compose: {}".format(compose))
+        result = find_compose_result(compose, results)
+        logger.debug("Current result finding: {}".format(result))
+        old_result = find_compose_result(compose, old_results)
+        logger.debug("Old result finding: {}".format(old_result))
+
+        alert_days = get_compose_config_prop("alert_days", conf, compose)
+
+        if result["latest_finished"] and result["latest_finished"]["age"] < alert_days:
+            logger.info(
+                "Alert threshold of {} days has not been reached; skipping".format(
+                    alert_days
+                )
+            )
+            continue
+
+        if old_result and "alert_date" in old_result:
+            alert_date = old_result["alert_date"]
+        else:
+            alert_date = "00000000"
+
+        if alert_date < today:
+            email_sender = get_compose_config_prop("email_sender", conf, compose)
+            extra = get_compose_config_prop("extra", conf, compose)
+            send_alert(result, alert_days, email_sender, email_to, extra)
+        else:
+            logger.info("Alert already sent for today")
+
+        result["alert_date"] = today
+
+
+def render(results, tmpl_path="templates", output_path="output", fmt="all"):
+    """
+    Render results using jinja2 templates
+
+    :param results: status results for configured composes
+    :param tmpl_path: directory containing jinka2 templates
+    :param output_path: directory in which to write rendered files
+    :param fmt: comma separated string of template suffixes to render, or "all"
+    """
+    os.makedirs(output_path, exist_ok=True)
+
+    j2_env = jinja2.Environment(loader=jinja2.FileSystemLoader(tmpl_path))
+    templates = j2_env.list_templates(extensions="j2")
+    logging.debug("Templates to render found in {}: {}".format(tmpl_path, templates))
+    if fmt != "all":
+        fmtlist = fmt.split(",")
+        templates = [name for name in templates if name.split(".")[-2] in fmtlist]
+    for tmpl_name in templates:
+        tmpl = j2_env.get_template(tmpl_name)
+        out = os.path.join(
+            output_path,
+            tmpl_name[:-3],
+        )
+        tmpl.stream(results=results).dump(out)
+        logger.info("{} results written to {}".format(tmpl_name, out))
+
+
 @click.command()
 @click.option(
     "--debug",
@@ -226,10 +420,10 @@ def cli(debug, config, url, name, version, description, input, output):
     today = now.date()
 
     results = {}
-    results["today"] = str(today)
+    results["date"] = today.strftime("%Y%m%d")
     results["now"] = now.strftime("%Y-%m-%d %H:%M:%S")
 
-    logger.debug("Today is {}".format(results["today"]))
+    logger.debug("Today is {}".format(results["date"]))
     logger.debug("Now is {}".format(results["now"]))
 
     old_results = None
@@ -253,31 +447,14 @@ def cli(debug, config, url, name, version, description, input, output):
 
     logger.debug("results = {}".format(pprint.pformat(results)))
 
+    alerts(conf, results, old_results)
+
     if output:
         with open(output, "w") as f:
             yaml.safe_dump(results, f)
         logger.info("YAML results saved to {}".format(output))
 
     render(results, tmpl_path=os.path.join(SCRIPTPATH, "templates"))
-
-
-def render(results, tmpl_path="templates", output_path="output", fmt="all"):
-    os.makedirs(output_path, exist_ok=True)
-
-    j2_env = jinja2.Environment(loader=jinja2.FileSystemLoader(tmpl_path))
-    templates = j2_env.list_templates(extensions="j2")
-    logging.debug("Templates to render found in {}: {}".format(tmpl_path, templates))
-    if fmt != "all":
-        fmtlist = fmt.split(",")
-        templates = [name for name in templates if name.split(".")[-2] in fmtlist]
-    for tmpl_name in templates:
-        tmpl = j2_env.get_template(tmpl_name)
-        out = os.path.join(
-            output_path,
-            tmpl_name[:-3],
-        )
-        tmpl.stream(results=results).dump(out)
-        logger.info("{} results written to {}".format(tmpl_name, out))
 
 
 if __name__ == "__main__":
